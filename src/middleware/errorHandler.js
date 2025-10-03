@@ -1,8 +1,4 @@
-/**
- * Middleware de tratamento de erros
- * Este middleware captura e trata todos os erros da aplicação
- */
-
+// Este middleware captura e trata todos os erros da aplicação
 const errorHandler = (err, req, res, next) => {
     console.error('❌ Erro capturado:', err.message);
 

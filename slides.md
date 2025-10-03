@@ -82,13 +82,14 @@ livraria/
 │── .env                          <-- Variáveis de ambiente  
 │── package.json
 │── src/
-│   │── app.js                    <-- Configuração principal (simplificado)
+│   │── app.js                    <-- Orquestração das rotas e middlewares
 │   │── config/
 │   │   └── express.js            <-- Configuração do Express + Morgan
 │   │── middleware/
 │   │   └── errorHandler.js       <-- Tratamento de erros
 │   └── routes/
-│       └── livros.routes.js      <-- Rotas de livros
+│       │── index.js              <-- Centralizador de rotas
+│       └── livros.routes.js      <-- Rotas específicas de livros
 ```
 
 ---
@@ -150,22 +151,29 @@ app.listen(PORT, () => {
 
 ---
 
-# 🛠 Arquivo `src/app.js` (Refatorado)
+# 🛠 Arquivo `src/app.js`
 
-1. **Nova abordagem modular:** Importa configurações de arquivos especializados.
+**Orquestração principal da aplicação:**
 
 ```js
-// src/app.js
-const { createExpressApp, setupRoutes, setupErrorHandling } = require("./config/express");
+const app = require("./config/express");
 
-// Cria a instância do Express com configurações básicas
-const app = createExpressApp();
+// Todas as rotas da aplicação (centralizadas)
+const routes = require("./routes"); 
 
-// Configura todas as rotas da aplicação
-setupRoutes(app);
+// Configura o middleware de tratamento de erros
+const errorHandler = require("./middleware/errorHandler"); 
 
-// Configura o tratamento de erros e handlers finais
-setupErrorHandling(app);
+// Configura as rotas com prefixo /api
+app.use("/api", routes); 
+
+// Middleware de tratamento de erros
+app.use(errorHandler);
+
+// Handler para rotas não encontradas (404)
+app.use((req, res) => {
+    res.status(404).json({ erro: "Endpoint não encontrado" });
+});
 
 module.exports = app;
 ```
@@ -174,63 +182,60 @@ module.exports = app;
 
 # ⚙️ Arquivo `src/config/express.js`
 
-**Configuração centralizada com Morgan:**
+**Configuração simplificada do Express:**
 
 ```js
 // src/config/express.js
 const express = require("express");
 const morgan = require("morgan");
-const errorHandler = require("../middleware/errorHandler");
 
-function createExpressApp() {
-    const app = express();
+const app = express();
 
-    // Middleware básicos do Express
-    app.use(express.json()); 
-    app.use(express.urlencoded({ extended: true }));
-    app.use(morgan('combined'));
+// Middleware básicos do Express
+app.use(express.json()); // Middleware para interpretar JSON
+app.use(express.urlencoded({ extended: true })); // Suporte para dados de formulários
+app.use(morgan("combined")); // Logging HTTP
 
-    return app;
-}
+module.exports = app;
 ```
 
 ---
 
-# ⚙️ Arquivo `src/config/express.js` (cont.)
+# 📂 Arquivo `src/routes/index.js` (Novo!)
 
-3. **Configuração das rotas:**
+**Centralizador de todas as rotas:**
 
 ```js
-function setupRoutes(app) {
-    const livrosRoutes = require("../routes/livros.routes");
+// src/routes/index.js
+const express = require("express");
+const router = express.Router();
 
-    // Rota inicial (explicação do sistema)
-    app.get("/", (req, res) => {
-        const response = {
-            mensagem: "Bem-vindo à API da Livraria!",
-        };
+// Rotas de livros
+const livrosRoutes = require("./livros.routes");
 
-        res.status(200).json(response);
+// Rota inicial (explicação do sistema)
+router.get("/", (req, res) => {
+    res.status(200).json({
+        mensagem: "Bem-vindo à API da Livraria! Use /livros para gerenciar os livros.",
     });
+});
 
-    // Configura as rotas para livros
-    app.use("/livros", livrosRoutes);
+// Usa as rotas de livros
+router.use("/livros", livrosRoutes);
 
-    // Adicionar outros grupos de rotas aqui se necessário
-}
+module.exports = router;
 ```
 
 ---
 
 # ❌ Arquivo `src/middleware/errorHandler.js`
 
-```js
-// src/middleware/errorHandler.js
-const errorHandler = (err, req, res, next) => {
-    console.error('❌ Erro capturado:', err.message);
+**Tratamento de erros simplificado:**
 
+```js
+// Este middleware captura e trata todos os erros da aplicação
+const errorHandler = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
-        // Em desenvolvimento: retorna detalhes completos do erro
         res.status(500).json({
             erro: "Erro interno do servidor",
             mensagem: err.message,
@@ -240,7 +245,6 @@ const errorHandler = (err, req, res, next) => {
             method: req.method
         });
     } else {
-        // Em produção: retorna apenas mensagem genérica
         res.status(500).json({
             erro: "Erro interno do servidor",
             timestamp: new Date().toISOString()
@@ -253,30 +257,9 @@ module.exports = errorHandler;
 
 ---
 
-# � Por que Morgan é Melhor que Logger Customizado?
+# � Arquivo `src/routes/livros.routes.js`
 
-## **✅ Vantagens do Morgan:**
-- **🏭 Padrão da indústria** - Usado por milhões de desenvolvedores
-- **🎨 Formatos predefinidos** - `dev`, `common`, `tiny`, `combined`
-- **⚡ Performance otimizada** - Código testado e otimizado
-- **🔧 Configuração flexível** - Tokens personalizáveis
-- **📁 Suporte a arquivos** - Logs para arquivos em produção
-
-## **❌ Problemas do Logger Customizado:**
-- **🔄 Reinventar a roda** - Código desnecessário para manter
-- **⚠️ Funcionalidades limitadas** - Sem colorização, métricas, etc.
-- **🐛 Bugs potenciais** - Código não testado extensivamente
-
-## **📈 Resultado:**
-- **90% menos código** para manter
-- **Funcionalidades profissionais** prontas
-- **Facilidade de configuração** para diferentes ambientes
-
----
-
-# �🛠 Arquivo `src/routes/livros.routes.js`
-
-**As rotas permanecem iguais**, mas agora estão melhor organizadas na nova estrutura:
+**Rotas específicas para gerenciar livros:**
 
 ```js
 const express = require("express");
@@ -416,7 +399,7 @@ router.get("/categoria/:categoria", (req, res) => {
     res.status(200).json(filtrados);
 });
 
-module.exports = router;  // 👈 Não esqueça de exportar!
+module.exports = router;
 ```
 
 ---
@@ -427,22 +410,36 @@ module.exports = router;  // 👈 Não esqueça de exportar!
 npm run dev
 ```
 
-Acesse `http://localhost:3000` no navegador ou use o Postman/Insomnia para testar as rotas.
+**📍 Rotas disponíveis:**
+- Rota inicial: `http://localhost:3000/api/`
+- Listar livros: `http://localhost:3000/api/livros`
+- Adicionar livro: `POST http://localhost:3000/api/livros`
+- Obter livro: `GET http://localhost:3000/api/livros/:id`
+- Atualizar livro: `PUT http://localhost:3000/api/livros/:id`
+- Remover livro: `DELETE http://localhost:3000/api/livros/:id`
 
 ---
 
-# Comparação: Antes vs Depois
+# Principais Melhorias Implementadas
 
-## **❌ Estrutura Anterior:**
-```
-- app.js: 60+ linhas (tudo misturado)
-- Configuração, rotas, erros no mesmo arquivo
-- Difícil manutenção e teste
-```
+## **🏗️ Arquitetura:**
+- ✅ **Separação clara** de responsabilidades
+- ✅ **Roteamento centralizado** com `routes/index.js`
+- ✅ **Configuração isolada** em `config/express.js`
+- ✅ **Prefixo `/api`** para organização de endpoints
 
-## **✅ Nova Estrutura:**
-```
-- app.js: 15 linhas (apenas orquestração)
-- config/express.js: Configuração isolada
-- middleware/: Funcionalidades específicas  
-```
+---
+
+# Git/GitHub
+
+- Iniciar repositório: `git init`
+- Adicionar arquivos: `git add .`
+- Commit inicial: `git commit -m "Initial commit"`
+- Publique no seu GitHub
+
+---
+
+# Desafios
+
+- Criar uma pasta `data` para armazenar os livros em um arquivo JSON
+- Implementar leitura e escrita nesse arquivo

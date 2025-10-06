@@ -452,5 +452,5 @@ npm run dev
 
 # Desafios
 
-- Criar uma pasta `data` para armazenar os livros em um arquivo JSON
+- Criar uma pasta `src/data` para armazenar os livros em um arquivo JSON
 - Implementar leitura e escrita nesse arquivo

@@ -1,0 +1,23 @@
+[
+    { 
+        "id": 1, 
+        "titulo": "Clean Code", 
+        "autor": "Robert C. Martin", 
+        "categoria": "Programação", 
+        "ano": 2008 
+    },
+    { 
+        "id": 2, 
+        "titulo": "O Programador Pragmático", 
+        "autor": "Andrew Hunt e David Thomas", 
+        "categoria": "Programação", 
+        "ano": 1999 
+    },
+    { 
+        "id": 3, 
+        "titulo": "Design Patterns", 
+        "autor": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides", 
+        "categoria": "Programação", 
+        "ano": 1994 
+    }
+]

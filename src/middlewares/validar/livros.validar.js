@@ -5,21 +5,12 @@ const validarLivro = (req, res, next) => {
     if (!titulo?.trim()) erros.push("Título é obrigatório");
     if (!autor?.trim()) erros.push("Autor é obrigatório");
     if (!categoria?.trim()) erros.push("Categoria é obrigatória");
-
-    if (!ano) {
-        erros.push("Ano é obrigatório");
-    } else {
-        const anoNum = parseInt(ano);
-        if (isNaN(anoNum) || anoNum < 1000 || anoNum > new Date().getFullYear()) {
-            erros.push("Ano inválido");
-        }
-    }
+    if (!ano || isNaN(parseInt(ano))) erros.push("Ano deve ser um número válido");
 
     if (erros.length > 0) {
         return res.status(400).json({ erro: "Dados inválidos", detalhes: erros });
     }
 
-    // Dados válidos, prosseguir para o próximo middleware ou controlador
     next();
 }
 

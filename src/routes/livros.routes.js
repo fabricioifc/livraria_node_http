@@ -8,10 +8,10 @@ const livrosController = new LivrosController();
 // Middlewares
 const { validarLivro, validarParamId } = require("../middlewares/validar/livros.validar");
 
-router.get("/", (req, res) => livrosController.listarLivros(req, res));
-router.get("/:id", validarParamId, (req, res) => livrosController.buscarLivroPorId(req, res));
-router.post("/", validarLivro, (req, res) => livrosController.criarLivro(req, res));
-router.put("/:id", validarParamId, validarLivro, (req, res) => livrosController.atualizarLivro(req, res));
-router.delete("/:id", validarParamId, (req, res) => livrosController.removerLivro(req, res));
+router.get("/", (req, res, next) => livrosController.listarLivros(req, res, next));
+router.get("/:id", validarParamId, (req, res, next) => livrosController.buscarLivroPorId(req, res, next));
+router.post("/", validarLivro, (req, res, next) => livrosController.criarLivro(req, res, next));
+router.put("/:id", validarParamId, validarLivro, (req, res, next) => livrosController.atualizarLivro(req, res, next));
+router.delete("/:id", validarParamId, (req, res, next) => livrosController.removerLivro(req, res, next));
 
 module.exports = router;

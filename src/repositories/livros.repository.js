@@ -36,7 +36,9 @@ class LivrosRepository extends RepositoryBase {
         const indice = livros.findIndex(livro => livro.id === id);
 
         if (indice === -1) {
-            throw new Error("Livro não encontrado");
+            const error = new Error("Livro não encontrado");
+            error.statusCode = 404;
+            throw error;
         }
 
         livros[indice] = { ...livros[indice], ...dadosAtualizados };
@@ -50,7 +52,9 @@ class LivrosRepository extends RepositoryBase {
         const indice = livros.findIndex(livro => livro.id === id);
 
         if (indice === -1) {
-            throw new Error("Livro não encontrado");
+            const error = new Error("Livro não encontrado");
+            error.statusCode = 404;
+            throw error;
         }
 
         const livroRemovido = livros[indice];

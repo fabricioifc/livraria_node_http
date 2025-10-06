@@ -2,10 +2,13 @@
 const errorHandler = (err, req, res, next) => {
     console.error('❌ Erro capturado:', err.message);
 
+    // Determina o status code baseado no erro
+    const statusCode = err.statusCode || 500;
+
     if (process.env.NODE_ENV === 'development') {
         // Em desenvolvimento: retorna detalhes completos do erro
-        res.status(500).json({
-            erro: "Erro interno do servidor",
+        res.status(statusCode).json({
+            erro: statusCode === 500 ? "Erro interno do servidor" : err.message,
             mensagem: err.message,
             stack: err.stack,
             timestamp: new Date().toISOString(),
@@ -13,9 +16,9 @@ const errorHandler = (err, req, res, next) => {
             method: req.method
         });
     } else {
-        // Em produção: retorna apenas mensagem genérica
-        res.status(500).json({
-            erro: "Erro interno do servidor",
+        // Em produção: retorna mensagem apropriada
+        res.status(statusCode).json({
+            erro: statusCode === 500 ? "Erro interno do servidor" : err.message,
             timestamp: new Date().toISOString()
         });
     }

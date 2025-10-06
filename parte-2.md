@@ -133,6 +133,17 @@ PORT=3000
 
 ---
 
+# 📂 Arquivo `.gitignore`
+
+```
+node_modules/
+.env
+```
+
+👉 Ignora a pasta `node_modules` e o arquivo `.env` no controle de versão.
+
+---
+
 # 🚀 Arquivo `server.js`
 
 ```js

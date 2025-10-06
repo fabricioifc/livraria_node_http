@@ -19,12 +19,5 @@
     "autor": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
     "categoria": "Programação",
     "ano": 1994
-  },
-  {
-    "id": 6,
-    "titulo": "Novo Livro",
-    "autor": "Autor Exemplo",
-    "categoria": "Ficção",
-    "ano": 2023
   }
 ]

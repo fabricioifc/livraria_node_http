@@ -1,23 +1,44 @@
 [
-    { 
-        "id": 1, 
-        "titulo": "Clean Code", 
-        "autor": "Robert C. Martin", 
-        "categoria": "Programação", 
-        "ano": 2008 
-    },
-    { 
-        "id": 2, 
-        "titulo": "O Programador Pragmático", 
-        "autor": "Andrew Hunt e David Thomas", 
-        "categoria": "Programação", 
-        "ano": 1999 
-    },
-    { 
-        "id": 3, 
-        "titulo": "Design Patterns", 
-        "autor": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides", 
-        "categoria": "Programação", 
-        "ano": 1994 
-    }
+  {
+    "id": 1,
+    "titulo": "Clean Code",
+    "autor": "Robert C. Martin",
+    "categoria": "Programação",
+    "ano": 2008
+  },
+  {
+    "id": 2,
+    "titulo": "O Programador Pragmático",
+    "autor": "Andrew Hunt e David Thomas",
+    "categoria": "Programação",
+    "ano": 1999
+  },
+  {
+    "id": 3,
+    "titulo": "Design Patterns",
+    "autor": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+    "categoria": "Programação",
+    "ano": 1994
+  },
+  {
+    "id": 5,
+    "titulo": "Novo Livro",
+    "autor": "Autor Exemplo",
+    "categoria": "Ficção",
+    "ano": 2023
+  },
+  {
+    "id": 6,
+    "titulo": "Novo Livro",
+    "autor": "Autor Exemplo",
+    "categoria": "Ficção",
+    "ano": 2023
+  },
+  {
+    "id": 7,
+    "titulo": "Novo Livro",
+    "autor": "Autor Exemplo",
+    "categoria": "Ficção",
+    "ano": 2023
+  }
 ]

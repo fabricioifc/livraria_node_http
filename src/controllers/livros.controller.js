@@ -1,48 +1,67 @@
-const fs = require("fs");
-const path = require("path");
-const livrosPath = path.join(__dirname, "../data/livros.json");
+const LivrosRepository = require("../repositories/livros.repository");
 
-// Função para ler os livros do arquivo JSON
-const lerLivros = () => {
-    const dados = fs.readFileSync(livrosPath);
-    return JSON.parse(dados);
-};
-
-const lerLivrosPorId = (id) => {
-    const livros = lerLivros();
-    return livros.find(livro => livro.id === id);
-};
-
-const cadastrarLivro = (novoLivro) => {
-    const livros = lerLivros();
-    livros.push(novoLivro);
-    fs.writeFileSync(livrosPath, JSON.stringify(livros, null, 2));
-};
-
-const atualizarLivro = (id, dadosAtualizados) => {
-    const livros = lerLivros();
-    const indice = livros.findIndex(livro => livro.id === id);
-    if (indice === -1) {
-        throw new Error("Livro não encontrado");
+class LivrosController {
+    constructor() {
+        this.livrosRepository = new LivrosRepository();
     }
-    livros[indice] = { ...livros[indice], ...dadosAtualizados };
-    fs.writeFileSync(livrosPath, JSON.stringify(livros, null, 2));
-};
 
-const removerLivro = (id) => {
-    const livros = lerLivros();
-    const indice = livros.findIndex(livro => livro.id === id);
-    if (indice === -1) {
-        throw new Error("Livro não encontrado");
+    // Listar todos os livros
+    async listarLivros(req, res) {
+        const livros = await this.livrosRepository.findAll();
+        res.status(200).json(livros);
     }
-    livros.splice(indice, 1);
-    fs.writeFileSync(livrosPath, JSON.stringify(livros, null, 2));
-};
 
-module.exports = {
-    lerLivros,
-    lerLivrosPorId,
-    cadastrarLivro,
-    atualizarLivro,
-    removerLivro,
-};
+    // Buscar livro por ID
+    async buscarLivroPorId(req, res) {
+        const id = parseInt(req.params.id);
+        const livro = await this.livrosRepository.findById(id);
+        if (!livro) {
+            return res.status(404).json({ erro: "Livro não encontrado" });
+        }
+        res.status(200).json(livro);
+    }
+
+    // Criar novo livro
+    async criarLivro(req, res) {
+        const { titulo, autor, categoria, ano } = req.body;
+        const novoLivro = await this.livrosRepository.create({
+            titulo,
+            autor,
+            categoria,
+            ano: parseInt(ano)
+        });
+        res.status(201).json({
+            mensagem: "Livro criado com sucesso",
+            data: novoLivro
+        });
+    }
+
+    // Atualizar livro
+    async atualizarLivro(req, res) {
+        const id = parseInt(req.params.id);
+        const { titulo, autor, categoria, ano } = req.body;
+        const livroAtualizado = await this.livrosRepository.update(id, {
+            titulo,
+            autor,
+            categoria,
+            ano: parseInt(ano)
+        });
+
+        res.status(200).json({
+            mensagem: "Livro atualizado com sucesso",
+            data: livroAtualizado
+        });
+    }
+
+    // Remover livro
+    async removerLivro(req, res) {
+        const id = parseInt(req.params.id);
+        const livroRemovido = await this.livrosRepository.delete(id);
+        res.status(200).json({
+            mensagem: "Livro removido com sucesso",
+            data: livroRemovido
+        });
+    }
+}
+
+module.exports = LivrosController;

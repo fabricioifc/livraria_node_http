@@ -72,13 +72,25 @@ style: |
         line-height: 1.1em;
     }
 
+    ul.small {
+        font-size: 0.7em;
+        list-style-type: none;
+        padding: 0;
+    }
+
+    ul.bottom {
+        position: absolute;
+        bottom: 60px;
+        width: 90%;
+    }
+
 ---
 
 # 📚 API Livraria com Express.js — Parte 3
 
-## Montando o projeto (arquitetura atual: lógica em Controller)
+## Implementação com JSON + MVC
 
-<ul class="small">
+<ul class="small bottom">
     <li>👨‍🏫 <b>Professor:</b> Fabricio Bizotto</li>
     <li>📘 <b>Disciplina:</b> Desenvolvimento Web I</li>
     <li>🎓 <b>Curso:</b> Ciência da Computação</li>
@@ -135,6 +147,8 @@ Atualize `package.json` com scripts:
 }
 ```
 
+> Essa etapa já foi feita na parte anterior, mas é bom relembrar.
+
 ---
 
 # Arquivo `.env` recomendado
@@ -143,6 +157,8 @@ Atualize `package.json` com scripts:
 NODE_ENV=development
 PORT=3000
 ```
+
+> Essa etapa já foi feita na parte anterior, mas é bom relembrar.
 
 ---
 
@@ -159,6 +175,8 @@ app.listen(PORT, () => {
 });
 ```
 
+> Essa etapa já foi feita na parte anterior, mas é bom relembrar.
+
 ---
 
 # `src/config/express.js` (config básica)
@@ -174,6 +192,8 @@ app.use(morgan('common'));
 
 module.exports = app;
 ```
+
+> Essa etapa já foi feita na parte anterior, mas é bom relembrar.
 
 ---
 
@@ -548,35 +568,23 @@ curl http://localhost:3000/api/livros/1
 curl -X POST http://localhost:3000/api/livros -H "Content-Type: application/json" -d '{"titulo":"Novo Livro","autor":"Autor","categoria":"Categ","ano":2025}'
 
 # Atualizar
-curl -X PUT http://localhost:3000/api/livros/1 -H "Content-Type: application/json" -d '{"titulo":"Alterado","autor":"Autor","categoria":"Categ","ano":2025}'
+curl -X PUT http://localhost:3000/api/livros/2 -H "Content-Type: application/json" -d '{"titulo":"Alterado","autor":"Autor","categoria":"Categ","ano":2025}'
 
 # Deletar (id que não existe deve devolver 404)
-curl -X DELETE http://localhost:3000/api/livros/999 -w "\nStatus: %{http_code}\n"
+curl -X DELETE http://localhost:3000/api/livros/2
 ```
 
 ---
 
 # Próximos passos e melhorias
 
-- Mover lógica de persistência para uma camada separada (Repository) ao escalar
-- Substituir JSON por banco (SQLite para protótipo, PostgreSQL/MySQL em produção)
+- Mover lógica de persistência para uma camada separada (Repository)
+- Substituir JSON por banco de dados relacional (SQLite, MySQL, PostgreSQL)
 - Adicionar testes automatizados (Jest + supertest)
-- Adicionar documentação OpenAPI (Swagger)
-- Controlar concorrência de escrita no arquivo em alta carga
+- Implementar autenticação e autorização (sessão, JSON Web Token - JWT)
 
 ---
 
-# Referências e material adicional
+# Desafios
 
-- Node.js fs.promises
-- Express.js documentation
-- Morgan (HTTP logger)
-- dotenv (variáveis de ambiente)
-
----
-
-# Encerramento
-
-- Perguntas?
-- Código fonte: repositório local / projeto entregue
-
+- Implementar paginação na listagem de livros (GET /api/livros?page=1&limit=10).

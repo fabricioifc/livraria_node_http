@@ -43,6 +43,19 @@ style: |
         list-style-type: none;
         padding: 0;
     }
+    ul.bottom {
+        position: absolute;
+        bottom: 60px;
+        width: 90%;
+    }
+    .small {
+        font-size: 0.7em;
+    }
+    .highlight {
+        background-color: #fffbcc;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
     section.title {
         display: flex;
         flex-direction: column;
@@ -68,13 +81,18 @@ style: |
         color: #555555;
         line-height: 1.1em;
     }
+    blockquote {
+        padding-left: 10px;
+        color: #666666;
+        font-size: 0.8em;
+    }
 ---
 
 # 📚 API Livraria com Express.js — Parte 3 (Camada Repository)
 
 ## Evoluindo o projeto: separando persistência da lógica de negócio
 
-<ul class="small">
+<ul class="small bottom">
     <li>👨‍🏫 <b>Professor:</b> Fabricio Bizotto</li>
     <li>📘 <b>Disciplina:</b> Desenvolvimento Web I</li>
     <li>🎓 <b>Curso:</b> Ciência da Computação</li>
@@ -96,7 +114,6 @@ style: |
 # Estrutura atualizada do projeto
 
 ```
-
 livraria_node_http/
 ├─ server.js
 ├─ .env
@@ -241,8 +258,14 @@ module.exports = LivrosRepository;
 
 # Refatorando o Controller
 
-Agora o `LivrosController` **não manipula mais diretamente o JSON**,
-mas usa o **repositório especializado** para isso.
+<p class="small">
+Agora o <span class="highlight">LivrosController</span><b>não manipula mais diretamente o JSON</b>,
+mas usa o <b>repositório especializado</b> para isso.
+</p>
+
+![MVC com Repository](mvc.png)
+
+> Na camada Model, o `Repository` atua como um intermediário entre o Controller e a fonte de dados (JSON).
 
 ---
 
@@ -340,3 +363,9 @@ router.delete("/:id", validarParamId, (req, res, next) => livrosController.remov
 
 module.exports = router;
 ```
+---
+
+# Desafios
+
+- Instalar a extensão da ferramenta Postman no VSCode.
+- Testar todas as rotas da API usando o Postman.

@@ -255,7 +255,7 @@ Para simular um banco de dados simples, usaremos um arquivo JSON (`src/data/livr
 
 ![MVC](mvc.png)
 
-Modelo-Vista-Controlador (MVC) é um padrão de arquitetura de software que separa a aplicação em três componentes principais: Modelo, Visão e Controlador.
+Modelo-Visão-Controlador (MVC) é um padrão de arquitetura de software que separa a aplicação em três componentes principais: Modelo, Visão e Controlador.
 
 ---
 

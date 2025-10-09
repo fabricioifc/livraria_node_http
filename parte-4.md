@@ -3,7 +3,7 @@ marp: true
 theme: default
 paginate: true
 size: 16:9
-header: 'API Livraria com Express.js — Parte 3 (Com Repositories)'
+header: 'API Livraria com Express.js — Parte 4'
 footer: 'Desenvolvimento Web I - Ciência da Computação - 4ª fase'
 style: |
     body {

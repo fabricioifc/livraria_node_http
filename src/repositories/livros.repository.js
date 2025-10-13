@@ -39,8 +39,7 @@ class LivrosRepository extends RepositoryBase {
             error.statusCode = 404;
             throw error;
         }
-
-        livros[indice].atualizar(dadosAtualizados);
+        livros[indice] = new Livro({ ...livros[indice], ...dadosAtualizados });
         await this._saveToFile(livros.map(l => l.toJSON()));
         return livros[indice];
     }

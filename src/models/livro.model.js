@@ -7,6 +7,7 @@ class Livro {
         this.categoria = String(categoria).trim();
         this.ano = Number.isInteger(ano) ? ano : parseInt(ano, 10);
 
+        // Validação básica
         this._validar();
     }
 
@@ -29,21 +30,6 @@ class Livro {
             categoria: this.categoria,
             ano: this.ano
         };
-    }
-
-    atualizar(campos) {
-        const permitido = ["titulo", "autor", "categoria", "ano"];
-        for (const chave of Object.keys(campos)) {
-            if (!permitido.includes(chave)) continue;
-            if (chave === "ano") {
-                const novoAno = Number.isInteger(campos.ano) ? campos.ano : parseInt(campos.ano, 10);
-                this.ano = novoAno;
-            } else {
-                this[chave] = String(campos[chave]).trim();
-            }
-        }
-        this._validar();
-        return this;
     }
 
     _validar() {

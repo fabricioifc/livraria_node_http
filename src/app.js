@@ -1,4 +1,13 @@
 const app = require("./config/express");
+const { init: initDb } = require('./database/sqlite');
+// Inicializa o banco SQLite (schema + seed opcional). Não bloqueia o servidor se falhar
+initDb().then(() => {
+    if (process.env.NODE_ENV === 'development') {
+        console.log('SQLite inicializado.');
+    }
+}).catch((e) => {
+    console.error('Falha ao inicializar SQLite:', e.message);
+});
 // Todas as rotas da aplicação
 const routes = require("./routes");
 // Configura o middleware de tratamento de erros

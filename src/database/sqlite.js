@@ -73,24 +73,21 @@ async function init() {
       ano INTEGER NOT NULL
     )
   `);
-
-    // Se a tabela está vazia, popular com dados do JSON (se existir)
-    const countRow = await get('SELECT COUNT(*) as count FROM livros');
-    if (countRow && countRow.count === 0) {
-        const jsonPath = path.join(__dirname, '../data/livros.json');
-        try {
-            const raw = fs.readFileSync(jsonPath, 'utf-8');
-            const lista = JSON.parse(raw);
-            for (const item of lista) {
-                await run(
-                    'INSERT INTO livros (titulo, autor, categoria, ano) VALUES (?, ?, ?, ?)',
-                    [item.titulo, item.autor, item.categoria, parseInt(item.ano, 10)]
-                );
-            }
-            console.log(`SQLite: seed inicial de ${lista.length} livros realizado.`);
-        } catch (e) {
-            // silencioso se arquivo não existir
+    // Popular com dados iniciais se tabela estiver vazia
+    const row = await get("SELECT COUNT(*) as count FROM livros");
+    if (row.count === 0) {
+        const livrosIniciais = [
+            { titulo: "1984", autor: "George Orwell", categoria: "Ficção Científica", ano: 1949 },
+            { titulo: "O Senhor dos Anéis", autor: "J.R.R. Tolkien", categoria: "Fantasia", ano: 1954 },
+            { titulo: "Dom Casmurro", autor: "Machado de Assis", categoria: "Romance", ano: 1899 }
+        ];
+        for (const livro of livrosIniciais) {
+            await run(
+                "INSERT INTO livros (titulo, autor, categoria, ano) VALUES (?, ?, ?, ?)",
+                [livro.titulo, livro.autor, livro.categoria, livro.ano]
+            );
         }
+        console.log('Tabela livros populada com dados iniciais.');
     }
 }
 

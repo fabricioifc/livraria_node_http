@@ -2,6 +2,39 @@
 
 Este projeto é uma aplicação web simples para praticar conceitos básicos de desenvolvimento web, incluindo principalmente o protocolo HTTP, HTML, CSS e JavaScript. A aplicação simula uma livraria onde os usuários podem cadastrar, visualizar, editar e excluir livros.
 
+## Banco de Dados (SQLite + Prisma)
+
+Este projeto usa SQLite com Prisma ORM.
+
+- Arquivo do banco: `src/data/livraria.db`
+- URL de conexão em `.env`:
+
+```
+DATABASE_URL="file:./src/data/livraria.db"
+```
+
+### Migrações e Client
+
+- Gerar/atualizar client Prisma:
+
+```bash
+npx prisma generate
+```
+
+- Criar/aplicar migração (dev):
+
+```bash
+npx prisma migrate dev --name <nome>
+```
+
+### Seed
+
+O seed lê `src/data/livros.json` se existir; caso contrário, usa dados padrão.
+
+```bash
+npx prisma db seed
+```
+
 ## Como Testar
 
 Para testar os endpoints da aplicação, você pode usar ferramentas como Postman ou cURL. Abaixo estão os endpoints disponíveis:

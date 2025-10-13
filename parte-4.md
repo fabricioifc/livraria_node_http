@@ -88,7 +88,7 @@ style: |
     }
 ---
 
-# 📚 API Livraria com Express.js — Parte 3 (Camada Repository)
+# 📚 API Livraria com Express.js — Parte 4 (Camada Repository)
 
 ## Evoluindo o projeto: separando persistência da lógica de negócio
 

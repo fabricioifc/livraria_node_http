@@ -2,6 +2,14 @@
 
 Este projeto é uma aplicação web simples para praticar conceitos básicos de desenvolvimento web, incluindo principalmente o protocolo HTTP, HTML, CSS e JavaScript. A aplicação simula uma livraria onde os usuários podem cadastrar, visualizar, editar e excluir livros.
 
+## Tutoriais
+
+- [Parte 2](./parte-2.md)
+- [Parte 3](./parte-3.md)
+- [Parte 4](./parte-4.md)
+- [Parte 5](./parte-5.md)
+- [Parte 6 — Configurando SQLite (sqlite3 e better-sqlite3)](./parte-6.md)
+
 ## Como Testar
 
 Para testar os endpoints da aplicação, você pode usar ferramentas como Postman ou cURL. Abaixo estão os endpoints disponíveis:

@@ -284,12 +284,12 @@ module.exports = LivrosRepository;
 
 ---
 
-# Ajustes no Controller
+# Ajustes nas Rotas
 
 Podemos fazer `bind` para manter o contexto do `this`:
 
 ```js
-// src/controllers/livros.controller.js
+// src/routes/livros.routes.js
 router.get("/", livrosController.listarLivros.bind(livrosController));
 router.get("/:id", validarParamId, livrosController.buscarLivroPorId.bind(livrosController));
 router.post("/", validarLivro, livrosController.criarLivro.bind(livrosController));

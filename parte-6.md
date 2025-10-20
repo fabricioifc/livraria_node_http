@@ -319,3 +319,8 @@ npm start
 - Módulo `src/database/sqlite.js` (singleton + helpers + `init()`)
 - Inicialização no `app` (`db.init()`)
 - Repositório usando SQL (CRUD completo)
+
+# Desafios extras
+
+- Acrescentar as colunas faltantes (`editora`, `numeroPaginas`)
+- Testar com Postman

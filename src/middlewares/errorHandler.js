@@ -5,6 +5,17 @@ const errorHandler = (err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const dev = process.env.NODE_ENV === 'development';
 
+    // Mapeamento de erros do Sequelize (validação)
+    if (err && err.name === 'SequelizeValidationError') {
+        const detalhes = err.errors ? err.errors.map(e => e.message) : [err.message];
+        const payload = {
+            erro: 'Dados inválidos',
+            detalhes,
+            timestamp: new Date().toISOString()
+        };
+        if (dev) payload.stack = err.stack;
+        return res.status(400).json(payload);
+    }
     if (dev) {
         // Em desenvolvimento: retorna detalhes completos do erro
         const details = {

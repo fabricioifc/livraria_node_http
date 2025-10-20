@@ -7,12 +7,10 @@ class Livro {
         this.categoria = String(categoria).trim();
         this.ano = Number.isInteger(ano) ? ano : parseInt(ano, 10);
 
-        // Validação básica
         this._validar();
     }
 
     static fromJSON(json) {
-        // aceita tanto objetos já prontos quanto JSON puro
         return new Livro({
             id: json.id ?? null,
             titulo: json.titulo,

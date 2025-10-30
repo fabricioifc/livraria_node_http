@@ -130,19 +130,49 @@ style: |
 npm install express-session bcrypt
 ```
 
+> `express-session`: Gerencia sessões de usuário no Express.js
+> `bcrypt`: Biblioteca para hashing seguro de senhas
+
 ---
 
 # Tabela users no SQLite
 
 ```js
 // src/database/sqlite.js (trecho)
-run(`CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-)`);
+function init() {
+    // ... Tabela de livros existente
+    // Tabela de Usuários
+    run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    // ...
+}
+
 ```
+
+---
+
+# Configurando express-session
+
+```js
+// src/config/express.js (trecho)
+const session = require("express-session");
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "livraria_secret_key",
+  rolling: true, // renova a sessão a cada requisição
+  cookie: {
+    httpOnly: true,
+    secure: false, // true apenas em produção HTTPS
+    maxAge: 1000 * 60 * 60 * 2 // 2 horas
+  }
+}));
+```
+
+> Defina SESSION_SECRET no .env em produção. Use o comando openssl rand -base64 32 para gerar um valor seguro.
 
 ---
 
@@ -151,29 +181,26 @@ run(`CREATE TABLE IF NOT EXISTS users (
 ```js
 // src/models/user.model.js
 class User {
-  constructor({ id = null, username, email, password, created_at = null }) {
-    this.id = id;
-    this.username = String(username).trim();
-    this.email = String(email).trim().toLowerCase();
-    this.password = password; // hash
-    this.created_at = created_at;
-    this._validate();
-  }
-  _validate() {
-    // ...validação de campos
-  }
-  toJSON() {
-    return {
-      id: this.id,
-      username: this.username,
-      email: this.email,
-      created_at: this.created_at
-    };
-  }
-  static fromDB(row) {
-    return new User(row);
-  }
+    constructor({ id = null, username, password = undefined, created_at = undefined }) {
+        this.id = id ?? null;
+        this.username = String(username || '').trim();
+        this.created_at = created_at;
+        this.password = password; // opcional (registro/troca)
+        this._validar();
+    }
+    _validar() {
+        const erros = [];
+        if (!this.username || this.username.length < 3) erros.push('username deve ter pelo menos 3 caracteres');
+        if (this.password !== undefined) {
+            const pwd = String(this.password);
+            if (pwd.length < 6) erros.push('password deve ter pelo menos 6 caracteres');
+        }
+        if (erros.length) { const e = new Error('Dados de usuário inválidos'); e.statusCode = 400; e.details = erros; throw e; }
+    }
+    static fromDB(row) { return new User({ id: row.id, username: row.username, created_at: row.created_at }); }
+    toJSON() { return { id: this.id, username: this.username, created_at: this.created_at }; }
 }
+module.exports = User;
 ```
 
 ---
@@ -186,48 +213,24 @@ const db = require('../database/sqlite');
 const User = require('../models/user.model');
 
 class UsersRepository {
-  findById(id) {
-    const row = db.get('SELECT * FROM users WHERE id = ?', [id]);
-    return row ? User.fromDB(row) : null;
-  }
-  findByUsername(username) {
-    const row = db.get('SELECT * FROM users WHERE username = ?', [username]);
-    return row ? User.fromDB(row) : null;
-  }
-  findByEmail(email) {
-    const row = db.get('SELECT * FROM users WHERE email = ?', [email]);
-    return row ? User.fromDB(row) : null;
-  }
-  create({ username, email, password }) {
-    const result = db.run(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, password]
-    );
-    return this.findById(result.lastInsertRowid);
-  }
-  listAll() {
-    const rows = db.all('SELECT * FROM users ORDER BY id ASC');
-    return rows.map(row => User.fromDB(row));
-  }
+    async findById(id) {
+        const row = await db.get('SELECT id, username, created_at FROM users WHERE id = ?', [id]);
+        return row ? User.fromDB(row) : null;
+    }
+    async findByUsername(username) {
+        const row = await db.get('SELECT id, username, password_hash, created_at FROM users WHERE username = ?', [username]);
+        return row || null; // inclui password_hash
+    }
+    async create({ username, passwordHash }) {
+        const result = await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', [username, passwordHash]);
+        console.log(result);
+
+        const row = await db.get('SELECT id, username, created_at FROM users WHERE id = ?', [result.lastInsertRowid]);
+        return User.fromDB(row);
+    }
 }
-```
 
----
-
-# Configurando express-session
-
-```js
-// src/config/express.js (trecho)
-const session = require("express-session");
-app.use(session({
-  secret: process.env.SESSION_SECRET || "livraria_secret_key",
-  rolling: true, // renova a sessão a cada requisição
-  cookie: {
-    httpOnly: true,
-    secure: false, // true apenas em produção HTTPS
-    maxAge: 1000 * 60 * 60 * 2 // 2 horas
-  }
-}));
+module.exports = UsersRepository;
 ```
 
 ---
@@ -361,22 +364,24 @@ module.exports = { requireAuth };
 # Testando endpoints via cURL
 
 ```bash
-# Registrar usuário
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "fulano", "email": "fulano@email.com", "password": "123456"}'
+# subir o servidor
+npm run dev
 
-# Login
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{"username": "fulano", "password": "123456"}'
+# registrar (salva cookie)
+curl -i -c cookies.txt -H "Content-Type: application/json" \
+  -d '{"username":"alice","password":"secret123"}' \
+  http://localhost:3000/api/auth/register
 
-# Consultar usuário logado (-b: usar cookies, -c: salvar cookies)
-curl -b cookies.txt -c cookies.txt -X GET http://localhost:3000/api/auth/me
+# usuário atual (usa cookie)
+curl -b cookies.txt -c cookies.txt http://localhost:3000/api/auth/me
 
-# Logout
-curl -X POST http://localhost:3000/api/auth/logout -b cookies.txt
+# logout
+curl -b cookies.txt -X POST http://localhost:3000/api/auth/logout
+
+# login
+curl -i -c cookies.txt -H "Content-Type: application/json" \
+  -d '{"username":"alice","password":"secret123"}' \
+  http://localhost:3000/api/auth/login
 ```
 
 ---
@@ -395,7 +400,4 @@ curl -X POST http://localhost:3000/api/auth/logout -b cookies.txt
 # Próximos passos / Desafios
 
 - Proteger rotas de CRUD de livros para usuários autenticados
-- Adicionar validação extra (força de senha, email único)
-- Implementar recuperação de senha
-- Adicionar roles/permissões (admin, usuário)
----
+- Adicionar novos campos (email, nome completo) no registro

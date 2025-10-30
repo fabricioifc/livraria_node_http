@@ -2,32 +2,20 @@ const db = require('../database/sqlite');
 const User = require('../models/user.model');
 
 class UsersRepository {
-    findById(id) {
-        const row = db.get('SELECT * FROM users WHERE id = ?', [id]);
+    async findById(id) {
+        const row = await db.get('SELECT id, username, created_at FROM users WHERE id = ?', [id]);
         return row ? User.fromDB(row) : null;
     }
-
-    findByUsername(username) {
-        const row = db.get('SELECT * FROM users WHERE username = ?', [username]);
-        return row ? User.fromDB(row) : null;
+    async findByUsername(username) {
+        const row = await db.get('SELECT id, username, password_hash, created_at FROM users WHERE username = ?', [username]);
+        return row || null; // inclui password_hash
     }
+    async create({ username, passwordHash }) {
+        const result = await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', [username, passwordHash]);
+        console.log(result);
 
-    findByEmail(email) {
-        const row = db.get('SELECT * FROM users WHERE email = ?', [email]);
-        return row ? User.fromDB(row) : null;
-    }
-
-    create({ username, email, password }) {
-        const result = db.run(
-            'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-            [username, email, password]
-        );
-        return this.findById(result.lastInsertRowid);
-    }
-
-    listAll() {
-        const rows = db.all('SELECT * FROM users ORDER BY id ASC');
-        return rows.map(row => User.fromDB(row));
+        const row = await db.get('SELECT id, username, created_at FROM users WHERE id = ?', [result.lastInsertRowid]);
+        return User.fromDB(row);
     }
 }
 

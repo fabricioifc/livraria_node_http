@@ -1,17 +1,8 @@
 const app = require("./config/express");
 
-// Inicializa o banco de dados (Sequelize)
-const { sequelize } = require("./database");
-const defineLivroModel = require("./models/livro.sequelize.model");
-// Define modelos e sincroniza
-defineLivroModel(sequelize, require('sequelize').DataTypes);
-async function initDb() {
-    await sequelize.authenticate();
-    await sequelize.sync();
-    console.log('Banco de dados (Sequelize) inicializado');
-}
-// inicia de forma assíncrona, sem bloquear a exportação do app
-initDb().catch(err => console.error('Erro ao inicializar DB:', err));
+// Inicializa o banco de dados SQLite puro
+const db = require("./database/sqlite");
+db.init();
 
 // Todas as rotas da aplicação
 const routes = require("./routes");

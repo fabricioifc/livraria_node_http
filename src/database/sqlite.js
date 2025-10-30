@@ -37,15 +37,24 @@ function query(sql, params = []) {
 
 function init() {
     run(`
-    CREATE TABLE IF NOT EXISTS livros (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      titulo TEXT NOT NULL,
-      autor TEXT NOT NULL,
-      categoria TEXT NOT NULL,
-      ano INTEGER NOT NULL
-    )
-  `);
-    console.log('Banco de dados SQLite inicializado');
+        CREATE TABLE IF NOT EXISTS livros (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT NOT NULL,
+            autor TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            ano INTEGER NOT NULL
+        )
+    `);
+    run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    console.log('Banco de dados SQLite inicializado (livros, users)');
 }
 
 module.exports = { getDb, run, get, all, query, init };

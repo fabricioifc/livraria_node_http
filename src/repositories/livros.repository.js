@@ -10,7 +10,7 @@ class LivrosRepository extends RepositoryBase {
 
     async findAll() {
         const rows = await db.query("SELECT id, titulo, autor, categoria, ano FROM livros ORDER BY id ASC");
-        return rows.map(row => Livro.fromJSON(row));
+        return !rows ? [] : rows.map(row => Livro.fromJSON(row));
     }
 
     async findById(id) {
